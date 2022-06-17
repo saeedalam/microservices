@@ -1,0 +1,81 @@
+---
+version: "3.8"
+
+services:
+
+  book-service:
+    build: ./book-service
+    ports:
+      - 8001:4000
+    restart: 'always'
+    environment:
+      - DB_URL=mongodb://mongo/compose
+      - PORT=8001
+    volumes:
+      - ./book-service:/app
+    networks:
+      - mycompose
+  user-service:
+    build: ./user-service
+    ports:
+      - 8000:3000
+    restart: 'always'
+    environment:
+      - DB_URL=mongodb://mongo/compose
+      - PORT=8000
+    volumes:
+      - ./user-service:/app
+    networks:
+      - mycompose
+  grpahql-service:
+    build: ./grpahql-service
+    ports:
+      - 8004:4000
+    restart: 'always'
+    environment:
+      - DB_URL=mongodb://mongo/compose
+      - PORT=8000
+    volumes:
+      - ./grpahql-service:/app
+    networks:
+      - mycompose
+  mongo:
+    image: mongo:4.0-xenial
+    container_name: mongoDB
+    ports:
+      - 27017:27017
+    volumes:
+      - compose:/data/db
+    command: mongod --logpath=/dev/null
+    networks:
+      - mycompose
+  mariadb:
+      image: mariadb:10.7
+      ports:
+        - 3306:3306
+      volumes:
+        - ~/apps/mariadb:/var/lib/mysql
+      environment:
+        - MYSQL_ROOT_PASSWORD="secret"
+        - MYSQL_USER="node"
+        - MYSQL_PASSWORD="secret"
+        - MYSQL_DATABASE="myAppDB"
+      networks:
+        - mycompose
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: 'rabbitmq'
+    ports:
+        - 5672:5672
+        - 15672:15672
+    volumes:
+        - ~/apps/rabbitmq/data/:/var/lib/rabbitmq/
+        - ~/apps/rabbitmq/log/:/var/log/rabbitmq
+    networks:
+        - mycompose
+
+volumes:
+  compose:
+networks:
+  mycompose:
+    driver: bridge
