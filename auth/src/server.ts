@@ -1,3 +1,3 @@
 import app from "./app";
 
-app.listen(3000, () => console.log("Auth service is running ..."));
+app.listen(3001, () => console.log("Auth service is running ..."));
